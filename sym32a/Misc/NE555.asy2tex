@@ -1,0 +1,18 @@
+Type Node
+TexOrigin 0 0 0 False
+SymOrigin 0 0 0 False
+BeginPinList
+EndPinList
+TexElementName NE555
+BeginTex
+ \draw [thick] (#self.texx1#-3.5, #self.texy1#-4.0) rectangle (#self.texx1#+3.5, #self.texy1#+4.0);
+ \node at (#self.texx1#, #self.texy1#) [align=center] {\textbf{NE555}\\\small #self.name#};
+ \node [right] at (#GND:x1#, #GND:y1#) {\tiny GND};
+ \node [right] at (#TRIG:x1#, #TRIG:y1#) {\tiny TRIG};
+ \node [right] at (#OUT:x1#, #OUT:y1#) {\tiny OUT};
+ \node [right] at (#RST:x1#, #RST:y1#) {\tiny RST};
+ \node [left] at (#CV:x1#, #CV:y1#) {\tiny CV};
+ \node [left] at (#THRS:x1#, #THRS:y1#) {\tiny THRS};
+ \node [left] at (#DIS:x1#, #DIS:y1#) {\tiny DIS};
+ \node [left] at (#Vcc:x1#, #Vcc:y1#) {\tiny Vcc};
+EndTex

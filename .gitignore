@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+dist/
+
+# LaTeX build / preview artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*_preview*.png
+*_prev*.png
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
