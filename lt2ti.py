@@ -1435,6 +1435,8 @@ class SchObject:
         res = getattr(self, attr);
         if isinstance(res, str):
             res = res.replace('µ', r'\ensuremath{\mu}').replace('\xb5', r'\ensuremath{\mu}')
+            if attr == 'value':
+                res = res.replace('_', r'\_')
         return str(res);
 
     def _mergeAttrStrToAttr(self, match):
