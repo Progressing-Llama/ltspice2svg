@@ -1639,6 +1639,72 @@ class Component(SchObject):
             res = res + indent+'    '+'component symbol:'+self.symbol.asString(indent+'    ');
         return res;
 
+    @property
+    def labelnodes(self):
+        return self.getLabelNodes()
+
+    def getLabelNodes(self):
+        inst_attr = None
+        val_attr = None
+        for a in self.attrlist:
+            if a.kind == 'InstName':
+                inst_attr = a
+            elif a.kind == 'Value':
+                val_attr = a
+        
+        has_inst_win = (inst_attr is not None and getattr(inst_attr, 'idnum', -1) not in (-1, '-1') and getattr(inst_attr, 'align', 'undefined') != 'undefined')
+        has_val_win = (val_attr is not None and getattr(val_attr, 'idnum', -1) not in (-1, '-1') and getattr(val_attr, 'align', 'undefined') != 'undefined')
+        
+        def align_to_anchor(align_str):
+            a = str(align_str).lower()
+            if 'left' in a:
+                return 'anchor=west'
+            elif 'right' in a:
+                return 'anchor=east'
+            elif 'top' in a:
+                return 'anchor=north'
+            elif 'bottom' in a:
+                return 'anchor=south'
+            elif 'center' in a:
+                return 'anchor=center'
+            return 'anchor=west'
+
+        scale = self.symbol.lt2tscale if (self.symbol and hasattr(self.symbol, 'lt2tscale')) else 1.0/32.0
+
+        escaped_val = str(self.value).replace('µ', r'\ensuremath{\mu}').replace('\xb5', r'\ensuremath{\mu}').replace('_', r'\_') if (self.value and self.value != 'undefined' and self.value != '""') else ''
+        escaped_name = str(self.name)
+
+        if has_inst_win or has_val_win:
+            nodes = []
+            if has_inst_win and inst_attr.visible:
+                x = round((self.x1 + inst_attr.x1rel) * scale, 3)
+                y = round(-(self.y1 + inst_attr.y1rel) * scale, 3)
+                anchor = align_to_anchor(inst_attr.align)
+                nodes.append(f'\\node[{anchor}] at ({x}, {y}) {{{escaped_name}}};')
+            elif inst_attr and inst_attr.visible:
+                nodes.append(f'\\node[anchor=west] at ({self.texx1}, {self.texy1}) {{{escaped_name}}};')
+
+            if has_val_win and val_attr.visible and escaped_val:
+                x = round((self.x1 + val_attr.x1rel) * scale, 3)
+                y = round(-(self.y1 + val_attr.y1rel) * scale, 3)
+                anchor = align_to_anchor(val_attr.align)
+                nodes.append(f'\\node[{anchor}] at ({x}, {y}) {{\\small {escaped_val}}};')
+            return ' '.join(nodes)
+        else:
+            is_mirrored = getattr(self, 'mirror', False)
+            if self.symbol and getattr(self.symbol, 'latexOriginMirror', False):
+                is_mirrored = not is_mirrored
+            
+            if escaped_val:
+                content = f'{escaped_name} \\\\ \\small {escaped_val}'
+            else:
+                content = escaped_name
+            
+            if is_mirrored:
+                return f'\\draw ({self.name}.west) ++(-0.1, 0.2) node[anchor=east, align=right] {{{content}}};'
+            else:
+                return f'\\draw ({self.name}.east) ++(0.1, 0.2) node[anchor=west, align=left] {{{content}}};'
+
     def _mergeAttrStrToAttr(self, match):
         m = match.group(1)
         for attr in (self.attrlist):
